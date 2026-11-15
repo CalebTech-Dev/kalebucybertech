@@ -164,3 +164,43 @@ header{border-bottom:4px solid #fff}
 .avatar{background:#fff}
 .avatar img{object-fit:contain;background:#fff;padding:3px}
 .avatar b{background:#fff;color:var(--ink)}
+
+/* Hero text animation (replays every time the hero scrolls into view) */
+.hero h1 .w{display:inline-block;opacity:0;transform:translateY(.55em)}
+.fade-up{opacity:0;transform:translateY(14px)}
+.hero.play h1 .w{animation:word-rise .75s cubic-bezier(.2,.7,.2,1) forwards;
+  animation-delay:calc(var(--i) * .09s + .15s)}
+.hero.play .fade-up{animation:fade-up .7s ease-out forwards;animation-delay:var(--d,0s)}
+@keyframes word-rise{to{opacity:1;transform:none}}
+@keyframes fade-up{to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){
+  .hero h1 .w,.fade-up{opacity:1!important;transform:none!important;animation:none!important}
+}
+
+/* After the reveal: words stay visible and a gentle wave repeats every 5 seconds */
+.hero.done h1 .w{opacity:1;transform:none;animation:none}
+.hero.done h1.wave .w{animation:word-wave .8s ease-in-out;animation-delay:calc(var(--i) * .07s)}
+@keyframes word-wave{0%,100%{transform:none}40%{transform:translateY(-.14em)}}
+@media(prefers-reduced-motion:reduce){.hero.done h1.wave .w{animation:none!important}}
+
+/* Services: keeps animating for as long as the cursor is on a card */
+@media(hover:hover) and (prefers-reduced-motion:no-preference){
+  .group{position:relative;transition:transform .35s cubic-bezier(.2,.7,.2,1)}
+  .group.sec{--glow:rgba(255,77,90,.75);--glow-soft:rgba(255,77,90,.28);--accent:#ff8a93}
+  .group.dev{--glow:rgba(77,163,255,.75);--glow-soft:rgba(77,163,255,.28);--accent:#9cc9ff}
+  .group::after{content:"";position:absolute;inset:-1px;border-radius:12px;pointer-events:none;opacity:0;
+    box-shadow:0 0 0 1px var(--glow),0 0 34px var(--glow-soft)}
+  .group:hover{transform:translateY(-6px)}
+  .group:hover::after{animation:glow-pulse 1.8s ease-in-out infinite}
+  .group:hover h3::before{animation:dot-pulse 1.2s ease-in-out infinite}
+  .group:hover .svc li{animation:svc-wave 2.4s ease-in-out infinite}
+  .group:hover .svc li strong{animation:svc-tint 2.4s ease-in-out infinite;animation-delay:inherit}
+  .group:hover .svc li:nth-child(1),.group:hover .svc li:nth-child(1) strong{animation-delay:0s}
+  .group:hover .svc li:nth-child(2),.group:hover .svc li:nth-child(2) strong{animation-delay:.2s}
+  .group:hover .svc li:nth-child(3),.group:hover .svc li:nth-child(3) strong{animation-delay:.4s}
+  .group:hover .svc li:nth-child(4),.group:hover .svc li:nth-child(4) strong{animation-delay:.6s}
+}
+@keyframes glow-pulse{0%,100%{opacity:.2}50%{opacity:1}}
+@keyframes dot-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.6)}}
+@keyframes svc-wave{0%,100%{transform:none}50%{transform:translateX(8px)}}
+@keyframes svc-tint{0%,100%{color:inherit}50%{color:var(--accent)}}

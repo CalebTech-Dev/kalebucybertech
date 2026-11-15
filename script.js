@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded",function(){
 
   // ---- Contact form (sent through Formspree) ----
   // Paste your Formspree form link here, e.g. "https://formspree.io/f/abcdwxyz"
-  var FORM_ENDPOINT = "https://formspree.io/f/maeoeybz";
+  var FORM_ENDPOINT = "https://formspree.io/f/maoeoybz";
 
   var f=document.getElementById("contact-form");
   var note=document.getElementById("form-note");
@@ -38,4 +38,65 @@ document.addEventListener("DOMContentLoaded",function(){
       btn.disabled=false; btn.textContent="Send message";
     });
   });
+});
+
+// ---- Hero text animation (words rise in one after another) ----
+document.addEventListener("DOMContentLoaded",function(){
+  var h=document.querySelector(".hero h1");
+  if(!h) return;
+  var words=h.textContent.trim().split(/\s+/);
+  h.setAttribute("aria-label",words.join(" "));
+  h.textContent="";
+  words.forEach(function(w,i){
+    var s=document.createElement("span");
+    s.className="w"; s.setAttribute("aria-hidden","true");
+    s.style.setProperty("--i",i);
+    s.textContent=w;
+    h.appendChild(s);
+    if(i<words.length-1) h.appendChild(document.createTextNode(" "));
+  });
+  var n=words.length;
+  var lead=document.querySelector(".hero .lead");
+  var acts=document.querySelector(".hero .actions");
+  var trust=document.querySelector(".hero .trust");
+  [lead,acts,trust].forEach(function(el,k){
+    if(!el) return;
+    el.classList.add("fade-up");
+    el.style.setProperty("--d",(n*0.09+0.35+k*0.15)+"s");
+  });
+
+  // Play the reveal when the hero is on screen, then repeat a gentle wave every 5 seconds
+  var hero=document.querySelector(".hero");
+  var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var doneT=null, waveT=null, loopT=null;
+
+  function startHero(){
+    hero.classList.add("play");
+    clearTimeout(doneT);
+    doneT=setTimeout(function(){ hero.classList.add("done"); }, (n*90)+1000);
+    if(reduce) return;
+    clearInterval(loopT);
+    loopT=setInterval(function(){
+      if(document.hidden || !hero.classList.contains("done")) return;
+      h.classList.remove("wave"); void h.offsetWidth; h.classList.add("wave");
+      clearTimeout(waveT);
+      waveT=setTimeout(function(){ h.classList.remove("wave"); }, (n*70)+900);
+    }, 5000);
+  }
+  function stopHero(){
+    clearTimeout(doneT); clearTimeout(waveT); clearInterval(loopT);
+    h.classList.remove("wave");
+    hero.classList.remove("play","done");
+  }
+
+  if("IntersectionObserver" in window){
+    new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){ if(!hero.classList.contains("play")) startHero(); }
+        else if(e.intersectionRatio===0){ stopHero(); }
+      });
+    },{threshold:[0,0.25]}).observe(hero);
+  } else {
+    startHero();
+  }
 });
